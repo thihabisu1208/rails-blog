@@ -10,9 +10,39 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_091335) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_03_123009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "post_categories", force: :cascade do |t|
+    t.bigint "post_id", null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_post_categories_on_category_id"
+    t.index ["post_id"], name: "index_post_categories_on_post_id"
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.string "title"
+    t.string "slug"
+    t.text "content"
+    t.string "excerpt"
+    t.string "featured_image_url"
+    t.integer "views_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "is_published"
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_posts_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email"
@@ -21,4 +51,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_091335) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "post_categories", "categories"
+  add_foreign_key "post_categories", "posts"
+  add_foreign_key "posts", "users"
 end
