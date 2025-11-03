@@ -18,10 +18,43 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
 
   <body>
-    <%= yield %>
+    <!-- Navigation Bar -->
+    <nav class="bg-gray-800 text-white p-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <%= link_to "DevLog", root_path, class: "text-xl font-bold" %>
+
+        <div class="space-x-4">
+          <% if current_user %>
+            <%= link_to "Admin", admin_path, class: "hover:text-gray-300" %>
+            <%= button_to "Logout", logout_path, method: :delete, class: "text-red-400 hover:text-red-300" %>
+          <% else %>
+            <%= link_to "Login", login_path, class: "hover:text-gray-300" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <% if notice %>
+      <div class="bg-green-100 text-green-800 p-4 text-center">
+        <%= notice %>
+      </div>
+    <% end %>
+
+    <% if alert %>
+      <div class="bg-red-100 text-red-800 p-4 text-center">
+        <%= alert %>
+      </div>
+    <% end %>
+
+    <!-- Main Content -->
+    <main>
+      <%= yield %>
+    </main>
   </body>
 </html>
