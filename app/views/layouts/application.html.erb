@@ -20,6 +20,9 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <%# Load JavaScript via importmap (includes Turbo) %>
+    <%= javascript_importmap_tags %>
   </head>
 
   <body>

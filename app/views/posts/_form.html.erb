@@ -1,0 +1,70 @@
+<!-- Reusable form partial for new and edit actions -->
+
+<!-- Display validation errors if any -->
+<% if @post.errors.any? %>
+  <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    <p class="font-bold"><%= pluralize(@post.errors.count, "error") %> prohibited this post:</p>
+    <ul class="list-disc list-inside">
+      <% @post.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<!-- form_with automatically handles new vs edit (POST vs PATCH) -->
+<%= form_with(model: @post, local: true) do |form| %>
+  <!-- Title field -->
+  <div class="mb-4">
+    <%= form.label :title %>
+    <%= form.text_field :title, class: "w-full border px-4 py-2 rounded", placeholder: "Your post title" %>
+  </div>
+
+  <!-- Excerpt field (for social sharing cards) -->
+  <div class="mb-4">
+    <%= form.label :excerpt %>
+    <%= form.text_area :excerpt, rows: 3, class: "w-full border px-4 py-2 rounded", placeholder: "Summary for social sharing" %>
+  </div>
+
+  <!-- Featured image URL (from Unsplash or other sources) -->
+  <div class="mb-4">
+    <%= form.label :featured_image_url, "Featured Image URL" %>
+    <%= form.text_field :featured_image_url, class: "w-full border px-4 py-2 rounded", placeholder: "https://images.unsplash.com/..." %>
+  </div>
+
+  <!-- Content field (will support markdown later) -->
+  <div class="mb-4">
+    <%= form.label :content %>
+    <%= form.text_area :content, rows: 12, class: "w-full border px-4 py-2 rounded font-mono text-sm", placeholder: "Write your post (markdown supported)" %>
+  </div>
+
+  <!-- Categories checkboxes (many-to-many relationship) -->
+  <div class="mb-4">
+    <%= form.label :category_ids, "Categories" %>
+    <div class="space-y-2 mt-2">
+      <% @categories.each do |category| %>
+        <label class="flex items-center cursor-pointer">
+          <!-- multiple: true allows selecting multiple categories -->
+          <!-- category.id is the value if checked, nil if unchecked -->
+          <%= form.check_box :category_ids, { multiple: true }, category.id, nil %>
+          <span class="ml-2"><%= category.name %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Publish checkbox -->
+  <div class="mb-6">
+    <label class="flex items-center cursor-pointer">
+      <%= form.check_box :is_published %>
+      <span class="ml-2 font-medium">Publish this post</span>
+    </label>
+  </div>
+
+  <!-- Submit button (text changes based on new vs edit) -->
+  <div class="flex gap-2">
+    <!-- persisted? returns true if record exists in DB -->
+    <%= form.submit @post.persisted? ? "Update Post" : "Create Post", class: "bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700" %>
+    <%= link_to "Cancel", posts_path, class: "px-6 py-2 border rounded hover:bg-gray-100" %>
+  </div>
+<% end %>

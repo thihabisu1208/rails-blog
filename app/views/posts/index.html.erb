@@ -1,0 +1,69 @@
+<!-- Admin Dashboard: List all posts for current user -->
+<div class="container mx-auto py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">My Posts</h1>
+    <%= link_to "New Post", new_post_path, class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+  </div>
+
+  <% if @posts.any? %>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-100 border-b">
+            <th class="p-3 text-left">Title</th>
+            <th class="p-3 text-left">Status</th>
+            <th class="p-3 text-left">State</th>
+            <th class="p-3 text-left">Views</th>
+            <th class="p-3 text-left">Created</th>
+            <th class="p-3 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @posts.each do |post| %>
+            <!-- Gray out deleted posts -->
+            <tr class="border-b hover:bg-gray-50 <%= 'opacity-50 bg-gray-50' if post.discarded? %>">
+              <td class="p-3 font-medium">
+                <%= post.title %>
+                <% if post.discarded? %>
+                  <span class="text-xs text-gray-500 ml-2">(deleted <%= post.discarded_at.strftime("%b %d") %>)</span>
+                <% end %>
+              </td>
+              <td class="p-3">
+                <!-- Dynamic badge color based on publish status -->
+                <span class="<%= post.is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %> px-3 py-1 rounded text-sm">
+                  <%= post.is_published ? "Published" : "Draft" %>
+                </span>
+              </td>
+              <td class="p-3">
+                <!-- Show deleted state -->
+                <% if post.discarded? %>
+                  <span class="bg-red-100 text-red-800 px-3 py-1 rounded text-sm">Deleted</span>
+                <% else %>
+                  <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm">Active</span>
+                <% end %>
+              </td>
+              <td class="p-3"><%= post.views_count %></td>
+              <td class="p-3 text-sm text-gray-600"><%= post.created_at.strftime("%b %d, %Y") %></td>
+              <td class="p-3 space-x-2">
+                <% if post.discarded? %>
+                  <!-- Restore button for deleted posts -->
+                  <%= link_to "Restore", restore_post_path(post), data: { turbo_method: :patch }, class: "text-green-600 hover:underline" %>
+                <% else %>
+                  <!-- Edit and Delete for active posts -->
+                  <%= link_to "Edit", edit_post_path(post), class: "text-blue-600 hover:underline" %>
+                  <%= link_to "Delete", post_path(post), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this post?" }, class: "text-red-600 hover:underline" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <!-- Empty state -->
+    <div class="text-center py-12 text-gray-500">
+      <p class="mb-4">No posts yet.</p>
+      <%= link_to "Create your first post!", new_post_path, class: "text-blue-600 hover:underline" %>
+    </div>
+  <% end %>
+</div>

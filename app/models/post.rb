@@ -1,4 +1,7 @@
 class Post < ApplicationRecord
+  # Soft delete support
+  include Discard::Model
+
   # Associations
   belongs_to :user
   has_many :post_categories, dependent: :destroy
@@ -13,6 +16,10 @@ class Post < ApplicationRecord
   # Scopes (reusable queries)
   scope :published, -> { where(is_published: true) }
   scope :by_views, -> { order(views_count: :desc) }
+
+  def to_param
+    slug
+  end
 
   private
 

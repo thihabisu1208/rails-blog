@@ -11,7 +11,11 @@ Rails.application.routes.draw do
   get "/admin", to: "posts#index"
 
   # Posts routes (standard CRUD)
-  resources :posts
+  resources :posts do
+    member do
+      patch :restore
+    end
+  end
 
   # Categories routes (for managing categories)
   resources :categories, only: [ :index, :create, :destroy ]
