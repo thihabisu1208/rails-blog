@@ -43,6 +43,12 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
+  # Disable asset compilation in tests for speed
+  config.before(:each, type: :request) do
+    allow_any_instance_of(ActionView::Base).to receive(:stylesheet_link_tag).and_return('')
+    allow_any_instance_of(ActionView::Base).to receive(:javascript_include_tag).and_return('')
+  end
+
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
 

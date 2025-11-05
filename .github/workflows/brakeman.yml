@@ -1,0 +1,21 @@
+name: Brakeman Security Scan
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rails
+        uses: ./.github/actions/setup-rails
+
+      - name: Run Brakeman security scanner
+        run: bin/brakeman --no-pager
+        continue-on-error: true

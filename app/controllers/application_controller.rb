@@ -2,9 +2,25 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
+  before_action :check_session_expiry
   before_action :authenticate_user!, unless: :public_page?
 
   private
+
+  def check_session_expiry
+    return unless session[:user_id] # Skip if not logged in
+
+    # Check if session has an expiry time set
+    if session[:expires_at].present?
+      expires_at = Time.parse(session[:expires_at].to_s)
+
+      # If session has expired, logout the user
+      if expires_at < Time.current
+        reset_session
+        redirect_to login_path, alert: "Your session has expired. Please login again."
+      end
+    end
+  end
 
   def authenticate_user!
     redirect_to login_path unless current_user
@@ -15,9 +31,25 @@ class ApplicationController < ActionController::Base
   end
 
   def public_page?
-    request.path == "/" ||
-    request.path.start_with?("/posts/") ||
-    request.path.start_with?("/sessions")
+    # Root path
+    return true if request.path == "/"
+
+    # Login/logout paths
+    return true if request.path.start_with?("/login") || request.path.start_with?("/sessions")
+
+    # Only allow GET requests to individual posts (show action)
+    # Must NOT match /posts/new or /posts/:id/edit
+    # Slug pattern: letters, numbers, hyphens, but NOT just "new"
+    if request.get?
+      match = request.path.match(%r{\A/posts/([a-z0-9\-]+)\z})
+      if match
+        slug = match[1]
+        # Explicitly exclude "new" which is a special Rails path
+        return slug != "new"
+      end
+    end
+
+    false
   end
 
   helper_method :current_user
