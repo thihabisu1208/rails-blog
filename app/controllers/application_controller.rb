@@ -31,9 +31,25 @@ class ApplicationController < ActionController::Base
   end
 
   def public_page?
-    request.path == "/" ||
-    request.path.start_with?("/posts/") ||
-    request.path.start_with?("/sessions")
+    # Root path
+    return true if request.path == "/"
+
+    # Login/logout paths
+    return true if request.path.start_with?("/login") || request.path.start_with?("/sessions")
+
+    # Only allow GET requests to individual posts (show action)
+    # Must NOT match /posts/new or /posts/:id/edit
+    # Slug pattern: letters, numbers, hyphens, but NOT just "new"
+    if request.get?
+      match = request.path.match(%r{\A/posts/([a-z0-9\-]+)\z})
+      if match
+        slug = match[1]
+        # Explicitly exclude "new" which is a special Rails path
+        return slug != "new"
+      end
+    end
+
+    false
   end
 
   helper_method :current_user

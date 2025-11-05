@@ -17,8 +17,8 @@ class User < ApplicationRecord
     length: { minimum: 6, message: "must be at least 6 characters" },
     if: -> { password.present? }
 
-  # Normalize email before save (lowercase)
-  before_save :normalize_email
+  # Normalize email before validation (so validation sees normalized email)
+  before_validation :normalize_email
 
   private
 
