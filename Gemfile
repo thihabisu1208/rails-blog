@@ -72,5 +72,5 @@ group :test do
   gem "selenium-webdriver"
 
   # Shoulda matchers for cleaner Rails specs
-  gem "shoulda-matchers", "~> 6.0"
+  gem "shoulda-matchers", "~> 7.0"
 end
