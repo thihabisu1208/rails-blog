@@ -1,0 +1,20 @@
+name: JavaScript Security Audit
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rails
+        uses: ./.github/actions/setup-rails
+
+      - name: Audit JavaScript dependencies
+        run: bin/importmap audit

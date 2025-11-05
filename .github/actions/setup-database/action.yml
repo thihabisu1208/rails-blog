@@ -1,0 +1,15 @@
+name: 'Setup Test Database'
+description: 'Creates and prepares test database'
+runs:
+  using: "composite"
+  steps:
+    - name: Install PostgreSQL packages
+      run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config
+      shell: bash
+
+    - name: Create and load database schema
+      env:
+        RAILS_ENV: test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432
+      run: bin/rails db:create db:schema:load
+      shell: bash
