@@ -4,12 +4,17 @@ class PostsController < ApplicationController
 
   def index
     # Show all posts including soft deleted ones
-    @posts = current_user.posts.with_discarded.order(created_at: :desc)
+    # Eager load categories to prevent N+1 queries
+    @posts = current_user.posts.with_discarded.includes(:categories).order(created_at: :desc)
   end
 
   def show
-    @post = Post.find_by!(slug: params[:id])
-    @post.increment!(:views_count)
+    # Only show published posts to public
+    @post = Post.published.find_by!(slug: params[:id])
+
+    # Atomic increment to prevent race conditions
+    # This executes: UPDATE posts SET views_count = views_count + 1 WHERE id = ?
+    Post.increment_counter(:views_count, @post.id)
   end
 
   def new

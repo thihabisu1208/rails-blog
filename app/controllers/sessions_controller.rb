@@ -12,7 +12,16 @@ class SessionsController < ApplicationController
     user = User.find_by(email: params[:email])
 
     if user&.authenticate(params[:password])
+      # Security: Reset session to prevent session fixation attacks
+      # This generates a new session ID, making any old session ID useless
+      reset_session
+
+      # Set the user_id in the new session
       session[:user_id] = user.id
+
+      # Set session expiry (2 weeks from now)
+      session[:expires_at] = 2.weeks.from_now
+
       redirect_to admin_path, notice: "Logged in successfully"
     else
       flash.now[:alert] = "Invalid email or password"
@@ -23,7 +32,9 @@ class SessionsController < ApplicationController
   # DELETE /logout
   # Logs the user out
   def destroy
-    session[:user_id] = nil
+    # Security: Completely reset session instead of just clearing user_id
+    # This ensures all session data is cleared, not just the user_id
+    reset_session
     redirect_to root_path, notice: "Logged out"
   end
 end
